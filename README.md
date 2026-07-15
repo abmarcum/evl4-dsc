@@ -87,9 +87,16 @@ Then edit `config.json` to match your setup:
 *(Note: `config.json` is ignored by git to protect your security PIN and passwords.)*
 
 ### Security & CORS Whitelisting
-For security, the backend enforces Cross-Origin Resource Sharing (CORS). By default, only local UI access (`localhost` / `127.0.0.1`) is permitted to send commands. If you are accessing the dashboard from another device on your network (e.g., your phone at `http://192.168.1.50:5173`), you **must** add that IP/URL to the `cors_origins` array in `config.json`, otherwise the backend will actively block all commands.
+For security, the backend enforces Cross-Origin Resource Sharing (CORS). By default, only local UI access (`localhost` / `127.0.0.1`) is permitted to send commands.
 
-**Wildcard Support:** You can use asterisks (`*`) in your origins to match subnets or dynamic IPs (e.g., `"http://192.168.1.*"` or `"http://*.local:5173"`). The backend automatically translates these into secure regex patterns.
+#### CORS Config for Local Private Networks:
+If you are running the frontend and backend on separate devices or ports within your home network, you **must** configure CORS:
+* **Dev Server on a separate device:** If you run the React dev server on a machine (`http://192.168.1.50:5173`) and connect to the backend, add `"http://192.168.1.50:5173"` to `cors_origins`.
+* **Custom Local Hostnames:** If you access the server via a local hostname (e.g., `"http://home-server.local:8000"` or `"http://alarm.local"`), add that origin to `cors_origins`.
+* **IP Subnet Wildcard:** You can use asterisks (`*`) to allow access from any device on your local subnet (e.g., `"http://192.168.1.*"` or `"http://*.local:5173"`). The backend automatically translates these into secure regex patterns.
+
+#### CORS Config for Internet Proxies:
+When exposing the dashboard over the internet using a reverse proxy (e.g., Nginx), you **must** add the public HTTPS URL (e.g., `"https://alarm.yourdomain.com"`) to `cors_origins` in `config.json`.
 
 ### Supported Zone Types
 The UI will dynamically render emojis for the following zone types:
@@ -140,3 +147,15 @@ If you want to run this permanently on a home server or Raspberry Pi, you can us
 docker-compose up -d
 ```
 This builds both the frontend and backend into a single, lightweight production container that automatically restarts on boot and serves the UI over port `8000`.
+
+### Exposing to the Internet (Nginx Reverse Proxy)
+To securely access your command center from outside your home network, it is highly recommended to set up an Nginx reverse proxy with HTTPS.
+
+A complete configuration example is provided in [nginx.conf.example](file:///Users/andrew/ai-workspace/code/evl4-dsc/nginx.conf.example).
+
+#### Key Setup Steps:
+1. **SSL Certificates:** Use a tool like Certbot (Let's Encrypt) to generate free SSL certificates for your domain.
+2. **WebSocket Upgrades:** Because the UI relies on real-time WebSocket communication (`/ws`), Nginx must be configured to pass the `Upgrade` and `Connection` headers. Without this, the live status updates will fail.
+3. **Serving Static Files:**
+   * **Option A (Recommended):** Let Nginx serve the static files directly from the `/static` folder (or `frontend/dist`). This is the most performant method.
+   * **Option B (Proxy Rewrite):** Let FastAPI serve the static assets. Because Vite builds assets to `/assets/` and FastAPI mounts them at `/static/`, Nginx must rewrite `/assets/` requests to `/static/assets/` on the proxy backend. Both strategies are illustrated in [nginx.conf.example](file:///Users/andrew/ai-workspace/code/evl4-dsc/nginx.conf.example).
