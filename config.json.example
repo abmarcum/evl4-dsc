@@ -1,0 +1,23 @@
+{
+  "ip_address": "[IP_ADDRESS]",
+  "username": "user",
+  "password": "user",
+  "code": "00000",
+  "port": 4025,
+  "panel_type": "DSC",
+  "evl_version": 4,
+  "cors_origins": [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000"
+  ],
+  "zone_names": {
+    "1": { "name": "Front Door", "type": "opening" },
+    "2": { "name": "Hallway Motion", "type": "motion" },
+    "3": { "name": "Glass Breaks", "type": "glass" },
+    "4": { "name": "Back Doors", "type": "opening" },
+    "5": { "name": "Front Windows", "type": "opening" },
+    "6": { "name": "Fire", "type": "smoke" }
+  }
+}

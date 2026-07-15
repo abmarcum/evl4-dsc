@@ -1,0 +1,19 @@
+[project]
+name = "evl4-dsc"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "async-timeout>=5.0.1",
+    "fastapi>=0.139.0",
+    "pydantic>=2.13.4",
+    "pyenvisalink>=4.10",
+    "ruff>=0.15.21",
+    "uvicorn>=0.51.0",
+    "websockets>=16.1",
+]
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true

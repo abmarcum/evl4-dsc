@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  evl4-dsc:
+    build: .
+    container_name: evl4-dsc
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config.json:/app/config.json
+    environment:
+      - TZ=America/Chicago # Adjust to your timezone

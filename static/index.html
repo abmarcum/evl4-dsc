@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVL-4EZR Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="ambient-bg">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+    </div>
+    
+    <div class="container fade-in-up">
+        <header class="app-header">
+            <div class="header-left">
+                <h1>Command Center</h1>
+                <p class="subtitle">DSC Envisalink EVL-4EZR</p>
+            </div>
+            <div class="header-right">
+                <div class="partition-select">
+                    <select id="partition-selector" onchange="changePartition()">
+                        <option value="1">Partition 1</option>
+                    </select>
+                </div>
+                <div class="connection-status">
+                    <div id="conn-dot" class="dot disconnected"></div>
+                    <span id="conn-text">Connecting</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Debug Alert -->
+        <div id="debug-alert" class="debug-alert hidden slide-down">
+            <div class="alert-content">
+                <span class="alert-icon">⚠️</span>
+                <div>
+                    <strong>Action Required:</strong> <span id="debug-alert-text"></span>
+                </div>
+            </div>
+            <button class="btn-ghost" onclick="sendCommand('bypass_all_open')">Bypass All</button>
+        </div>
+
+        <main>
+            <div class="dashboard-grid">
+                
+                <!-- Main Status & Controls -->
+                <div class="column main-col">
+                    <div class="card panel-card">
+                        <div class="status-ring">
+                            <h2 id="panel-state-text" class="state-text">Unknown</h2>
+                            <p id="panel-sub-state" class="sub-state">Waiting for panel...</p>
+                        </div>
+                        <div class="flags-container" id="flags-grid"></div>
+                        
+                        <div class="arming-controls">
+                            <button class="btn btn-primary" onclick="sendCommand('arm_stay')">Arm Stay</button>
+                            <button class="btn btn-success" onclick="sendCommand('arm_away')">Arm Away</button>
+                            <button class="btn btn-purple" onclick="sendCommand('arm_night')">Night Mode</button>
+                            <button class="btn btn-orange" onclick="sendCommand('arm_max')">Max Mode</button>
+                            <button class="btn btn-danger btn-full" onclick="sendCommand('disarm')">Disarm System</button>
+                        </div>
+                    </div>
+
+                    <div class="card keypad-card">
+                        <div class="card-header">
+                            <h3>Keypad Access</h3>
+                        </div>
+                        <div class="keypad-wrapper">
+                            <div class="keypad-display">
+                                <input type="password" id="keypad-input" placeholder="••••" readonly />
+                                <button class="btn-icon" onclick="clearKeypad()">⌫</button>
+                            </div>
+                            <div class="keypad-grid">
+                                <button class="key-btn" onclick="addKey('1')">1</button>
+                                <button class="key-btn" onclick="addKey('2')">2</button>
+                                <button class="key-btn" onclick="addKey('3')">3</button>
+                                <button class="key-btn" onclick="addKey('4')">4</button>
+                                <button class="key-btn" onclick="addKey('5')">5</button>
+                                <button class="key-btn" onclick="addKey('6')">6</button>
+                                <button class="key-btn" onclick="addKey('7')">7</button>
+                                <button class="key-btn" onclick="addKey('8')">8</button>
+                                <button class="key-btn" onclick="addKey('9')">9</button>
+                                <button class="key-btn" onclick="addKey('*')">*</button>
+                                <button class="key-btn" onclick="addKey('0')">0</button>
+                                <button class="key-btn" onclick="addKey('#')">#</button>
+                            </div>
+                            <button class="btn btn-outline btn-full" onclick="sendKeypadSequence()">Transmit</button>
+                        </div>
+                    <div class="card admin-card">
+                        <div class="card-header">
+                            <h3>System Administration</h3>
+                        </div>
+                        <div class="admin-grid">
+                            <button class="btn-outline" onclick="syncTime()">Sync Panel Time</button>
+                            <button class="btn-outline" onclick="sendCommand('macro_goodnight')">Goodnight Routine</button>
+                            <button class="btn-outline" onclick="debugTroubles()">System Troubles</button>
+                        </div>
+                        <div class="admin-form">
+                            <h4>Manage Access Codes</h4>
+                            <div class="code-inputs">
+                                <input type="password" id="master-code" placeholder="Master Code" />
+                                <input type="text" id="user-slot" placeholder="Slot (01-32)" />
+                                <input type="password" id="new-pin" placeholder="New PIN" />
+                                <button class="btn-primary" onclick="setAccessCode()">Set</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Info -->
+                <div class="column side-col">
+                    <div class="card zones-card">
+                        <div class="card-header flex-between">
+                            <h3>Zone Monitor</h3>
+                            <div class="flex-gap">
+                                <button id="btn-discovery" class="btn-text" onclick="toggleDiscoveryMode()">Debug Unknown</button>
+                                <button class="btn-text" onclick="sendCommand('bypass_all_open')">Bypass Open</button>
+                            </div>
+                        </div>
+                        <div class="zones-grid" id="zones-grid">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <div class="card outputs-card">
+                        <div class="card-header">
+                            <h3>Smart Outputs (PGM)</h3>
+                        </div>
+                        <div class="outputs-grid">
+                            <button class="btn-output" onclick="sendOutput(1)">Out 1</button>
+                            <button class="btn-output" onclick="sendOutput(2)">Out 2</button>
+                            <button class="btn-output" onclick="sendOutput(3)">Out 3</button>
+                            <button class="btn-output" onclick="sendOutput(4)">Out 4</button>
+                        </div>
+                    </div>
+
+                    <div class="card activity-card">
+                        <div class="card-header">
+                            <h3>System Log</h3>
+                        </div>
+                        <div class="activity-feed" id="activity-feed">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <div class="card panic-card">
+                        <div class="card-header">
+                            <h3>Emergency</h3>
+                        </div>
+                        <div class="panic-grid">
+                            <button class="btn-panic panic-police" onclick="sendPanic('Police')">Police</button>
+                            <button class="btn-panic panic-fire" onclick="sendPanic('Fire')">Fire</button>
+                            <button class="btn-panic panic-med" onclick="sendPanic('Ambulance')">Medical</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
