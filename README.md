@@ -151,11 +151,11 @@ This builds both the frontend and backend into a single, lightweight production 
 ### Exposing to the Internet (Nginx Reverse Proxy)
 To securely access your command center from outside your home network, it is highly recommended to set up an Nginx reverse proxy with HTTPS.
 
-A complete configuration example is provided in [nginx.conf.example](file:///Users/andrew/ai-workspace/code/evl4-dsc/nginx.conf.example).
+A complete configuration example is provided in [nginx.conf.example](nginx.conf.example).
 
 #### Key Setup Steps:
 1. **SSL Certificates:** Use a tool like Certbot (Let's Encrypt) to generate free SSL certificates for your domain.
 2. **WebSocket Upgrades:** Because the UI relies on real-time WebSocket communication (`/ws`), Nginx must be configured to pass the `Upgrade` and `Connection` headers. Without this, the live status updates will fail.
 3. **Serving Static Files:**
    * **Option A (Recommended):** Let Nginx serve the static files directly from the `/static` folder (or `frontend/dist`). This is the most performant method.
-   * **Option B (Proxy Rewrite):** Let FastAPI serve the static assets. Because Vite builds assets to `/assets/` and FastAPI mounts them at `/static/`, Nginx must rewrite `/assets/` requests to `/static/assets/` on the proxy backend. Both strategies are illustrated in [nginx.conf.example](file:///Users/andrew/ai-workspace/code/evl4-dsc/nginx.conf.example).
+   * **Option B (Proxy Rewrite):** Let FastAPI serve the static assets. Because Vite builds assets to `/assets/` and FastAPI mounts them at `/static/`, Nginx must rewrite `/assets/` requests to `/static/assets/` on the proxy backend. Both strategies are illustrated in [nginx.conf.example](nginx.conf.example).
