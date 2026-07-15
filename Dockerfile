@@ -24,7 +24,8 @@ RUN uv venv && uv pip install -r pyproject.toml
 RUN uv pip install --system fastapi uvicorn websockets pyenvisalink pydantic async-timeout
 
 # Copy config example (actual config mounted via volume)
-COPY config.json.example ./config.json
+COPY config.json ./config.json
+
 
 # Copy built frontend assets to static/
 RUN mkdir static
