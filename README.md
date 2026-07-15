@@ -2,6 +2,8 @@
 
 A dynamic, web-based UI for managing an Eyez-On Envisalink EVL-4EZR IP Security Interface Module connected to a DSC panel.
 
+![EVL-4EZR Command Center UI](images/evl4-ui.jpg)
+
 ## Architecture
 
 ```mermaid
